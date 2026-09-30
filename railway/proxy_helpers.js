@@ -3,6 +3,8 @@
 const requestsByClient = new Map();
 
 function isAllowedOrigin(origin, host) {
+  // Native Flutter HTTP clients do not send a browser Origin header.
+  if (!origin) return true;
   if (origin === "https://abdulkadiljhonardz-byte.github.io") return true;
   if (/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) return true;
   return origin === `https://${host}` || origin === `http://${host}`;

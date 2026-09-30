@@ -5,6 +5,7 @@ const assert = require("node:assert/strict");
 const {isAllowedOrigin, isRateLimited, validatedInput} = require("./proxy_helpers");
 
 test("allows the same host, GitHub Pages, and local development", () => {
+  assert.equal(isAllowedOrigin("", "course.up.railway.app"), true);
   assert.equal(isAllowedOrigin("https://course.up.railway.app", "course.up.railway.app"), true);
   assert.equal(isAllowedOrigin("https://abdulkadiljhonardz-byte.github.io", "course.up.railway.app"), true);
   assert.equal(isAllowedOrigin("http://localhost:3000", "localhost:3000"), true);
