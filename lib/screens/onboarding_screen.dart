@@ -37,7 +37,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       description:
           'See your top recommendations, compare match percentages, and open detailed course insights before deciding.',
       icon: Icons.bar_chart_rounded,
-      chips: ['Top Matches', 'Course Details', 'Saved Results'],
+      chips: ['Top Matches', 'Course Details', 'AI Insights'],
     ),
   ];
 

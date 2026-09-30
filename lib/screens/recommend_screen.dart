@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../models/recommendation_history.dart';
 import '../services/internet_connection_service.dart';
 import '../services/recommendation_engine.dart';
 import '../theme/app_palette.dart';
@@ -10,13 +9,9 @@ class RecommendScreen extends StatefulWidget {
   const RecommendScreen({
     super.key,
     required this.engine,
-    this.onSaved,
-    this.initialHistory,
   });
 
   final RecommendationEngine engine;
-  final VoidCallback? onSaved;
-  final RecommendationHistory? initialHistory;
 
   @override
   State<RecommendScreen> createState() => _RecommendScreenState();
@@ -99,7 +94,6 @@ class _RecommendScreenState extends State<RecommendScreen> {
 
   int _currentStep = 0;
   bool _loading = false;
-  int? _editingHistoryId;
 
   late final Map<String, int?> _interestRatings = {
     for (final item in _interestItems) item.label: 3,
@@ -119,46 +113,6 @@ class _RecommendScreenState extends State<RecommendScreen> {
     'Strengths & Weaknesses',
     'Summary',
   ];
-
-  @override
-  void initState() {
-    super.initState();
-    final history = widget.initialHistory;
-    if (history != null) {
-      _editingHistoryId = history.id;
-      _loadSavedHistory(history);
-    }
-  }
-
-  void _loadSavedHistory(RecommendationHistory history) {
-    _currentStep = 0;
-    _fullNameController.text = history.studentName;
-    _ageController.text = history.age;
-    _schoolController.text = history.school;
-    _saseController.text = history.cetScore?.toString() ?? '';
-    _examYearController.text = history.examYear;
-    _mathController.text = history.mathGrade.toString();
-    _englishController.text = history.englishGrade.toString();
-    _scienceController.text = history.scienceGrade.toString();
-    _filipinoController.text =
-        history.filipinoGrade > 0 ? history.filipinoGrade.toString() : '';
-    _selectedStrand =
-        _strandOptions.contains(history.strand) ? history.strand : null;
-
-    for (final item in _interestItems) {
-      _interestRatings[item.label] =
-          history.interestRatings[item.engineInterest] ??
-              (history.interest == item.engineInterest ? 5 : 3);
-    }
-    for (final value in _basicStrengthQuestions.values) {
-      _strengthQuestionRatings[value] =
-          history.strengths.contains(value) ? 5 : 3;
-    }
-    for (final value in _basicWeaknessQuestions.values) {
-      _weaknessQuestionRatings[value] =
-          history.weaknesses.contains(value) ? 5 : 3;
-    }
-  }
 
   @override
   void dispose() {
@@ -267,11 +221,6 @@ class _RecommendScreenState extends State<RecommendScreen> {
         children: [
           Row(
             children: [
-              if (_editingHistoryId != null)
-                const Chip(
-                  avatar: Icon(Icons.edit_rounded, size: 16),
-                  label: Text('Editing saved user'),
-                ),
               const Spacer(),
               TextButton.icon(
                 onPressed: _loading ? null : _resetForm,
@@ -1198,7 +1147,6 @@ class _RecommendScreenState extends State<RecommendScreen> {
       _scienceController.clear();
       _filipinoController.clear();
       _selectedStrand = null;
-      _editingHistoryId = null;
       for (final key in _interestRatings.keys) {
         _interestRatings[key] = 3;
       }
@@ -1245,17 +1193,10 @@ class _RecommendScreenState extends State<RecommendScreen> {
         return;
       }
 
-      await widget.engine.saveRecommendationSession(
-        input: input,
-        results: results,
-        replaceHistoryId: _editingHistoryId,
-      );
-
       if (!mounted) {
         return;
       }
 
-      widget.onSaved?.call();
       await Navigator.of(context).push(
         MaterialPageRoute(
           builder: (_) => RecommendationResultsScreen(
