@@ -25,19 +25,21 @@ Step by step ang proseso sa app:
 
 ## Run Locally
 
-### Website (pinakamabilis)
+### Website
 
-May standalone website sa root `index.html`. Wala itong kailangang package o
-API key; browser-local scoring engine at `localStorage` ang gamit nito.
+Ang website ay Flutter web build ng mismong app, kaya pareho ang design,
+screens, navigation, at recommendation flow ng mobile version.
 
 ```bash
-python3 -m http.server 8080 --bind 127.0.0.1
+flutter run -d chrome
 ```
 
-Pagkatapos, buksan ang `http://localhost:8080`. Para i-deploy, i-upload ang
-`index.html`, `manifest.webmanifest`, at `web/` folder sa anumang static host
-tulad ng GitHub Pages, Netlify, o Cloudflare Pages. Huwag isama ang
-`secrets.json` sa anumang public deployment.
+Ang production files para sa GitHub Pages ay nasa `docs/` at maaaring buuin
+ulit gamit ang:
+
+```bash
+flutter build web --release --base-href /ai-course-rec/ --output docs
+```
 
 ### Flutter app
 
@@ -62,15 +64,14 @@ Para sa local prototype, ilagay ang bagong Groq key sa ignored na
 }
 ```
 
-Pagkatapos i-save ang file, puwede nang gamitin ang normal Flutter command:
+Pagkatapos i-save ang file, gamitin ito bilang compile-time configuration:
 
 ```bash
-flutter run
+flutter run --dart-define-from-file=secrets.json
 ```
 
-Ilo-load ng app ang `secrets.json` bago gumawa ng recommendation engine. Ang
-`--dart-define-from-file=secrets.json` ay supported pa rin bilang optional
-override, pero hindi na ito kailangan para sa local school-project build.
+Hindi kasama ang `secrets.json` sa app assets o public web build. Kapag walang
+AI configuration, automatic na gagamitin ng app ang local scoring engine.
 
 Huwag gamitin ang direct API key setup sa production build. Ang
 `--dart-define` value ay maaaring ma-extract mula sa compiled Flutter app.

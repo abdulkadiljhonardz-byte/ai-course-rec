@@ -1,7 +1,3 @@
-import 'dart:convert';
-
-import 'package:flutter/services.dart';
-
 class AppSecrets {
   const AppSecrets({
     required this.groqApiKey,
@@ -13,21 +9,9 @@ class AppSecrets {
   final String groqModel;
   final String groqApiUrl;
 
-  static Future<AppSecrets> load() async {
-    try {
-      final raw = await rootBundle.loadString('secrets.json');
-      final json = jsonDecode(raw) as Map<String, dynamic>;
-      return AppSecrets(
-        groqApiKey: json['GROQ_API_KEY']?.toString().trim() ?? '',
-        groqModel: json['GROQ_MODEL']?.toString().trim() ?? '',
-        groqApiUrl: json['GROQ_API_URL']?.toString().trim() ?? '',
+  static Future<AppSecrets> load() async => const AppSecrets(
+        groqApiKey: String.fromEnvironment('GROQ_API_KEY'),
+        groqModel: String.fromEnvironment('GROQ_MODEL'),
+        groqApiUrl: String.fromEnvironment('GROQ_API_URL'),
       );
-    } on Object {
-      return const AppSecrets(
-        groqApiKey: '',
-        groqModel: '',
-        groqApiUrl: '',
-      );
-    }
-  }
 }
