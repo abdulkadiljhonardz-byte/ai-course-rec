@@ -1,0 +1,12 @@
+{
+  "name": "msu-sulu-course-guide",
+  "private": true,
+  "version": "1.0.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node railway/server.js",
+    "test:railway": "node --test railway/server.test.js"
+  }
+}

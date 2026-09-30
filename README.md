@@ -41,7 +41,7 @@ ulit gamit ang:
 flutter build web --release \
   --base-href /ai-course-rec/ \
   --output docs \
-  --dart-define=GROQ_API_URL=https://asia-southeast1-msu-sulu-course-guide.cloudfunctions.net/groqProxy
+  --dart-define=GROQ_API_URL=https://ai-course-rec-production.up.railway.app/api/recommend
 ```
 
 ### Flutter app
@@ -89,19 +89,24 @@ Ang proxy endpoint ay dapat tumanggap ng Groq Responses API request body at
 magbalik ng kaparehong response shape. Sa Android release, naka-enable na ang
 internet permission.
 
-## Secure Web AI Proxy
+## Secure Railway Web Deployment
 
-Ang public website ay gumagamit ng Firebase function sa `functions/`. Nasa
-Firebase Secret Manager ang `GROQ_API_KEY`; hindi ito kasama sa GitHub o sa
-compiled website. Para i-update ang backend:
+Ang Railway deployment ang nagse-serve ng Flutter website at ng secure
+`/api/recommend` Groq proxy. Ang `GROQ_API_KEY` ay Railway service variable at
+hindi kasama sa GitHub o compiled website.
 
 ```bash
-cd functions
-npm install
+flutter build web --release \
+  --base-href / \
+  --output railway/public \
+  --dart-define=GROQ_API_URL=/api/recommend
+
+cd railway
 npm test
-cd ..
-firebase deploy --only functions:groqProxy --project msu-sulu-course-guide
+railway up
 ```
+
+Live Railway site: `https://ai-course-rec-production.up.railway.app/`
 
 ## Notes
 
