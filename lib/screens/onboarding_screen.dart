@@ -15,7 +15,6 @@ class OnboardingScreen extends StatefulWidget {
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
-  final PageController _pageController = PageController();
   int _currentPage = 0;
 
   static const _pages = [
@@ -43,93 +42,88 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   ];
 
   @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final lastPage = _currentPage == _pages.length - 1;
 
     return Scaffold(
       backgroundColor: AppPalette.background,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  const Text(
-                    'Course Guide',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w800,
-                      color: AppPalette.primary,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    const Text(
+                      'Course Guide',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        color: AppPalette.primary,
+                      ),
                     ),
-                  ),
-                  const Spacer(),
-                  TextButton(
-                    onPressed: widget.onFinished,
-                    child: const Text('Skip'),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Expanded(
-                child: PageView.builder(
-                  controller: _pageController,
-                  itemCount: _pages.length,
-                  onPageChanged: (index) {
-                    setState(() {
-                      _currentPage = index;
-                    });
-                  },
-                  itemBuilder: (context, index) {
-                    final page = _pages[index];
-                    return _OnboardingPage(data: page);
-                  },
-                ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                  _pages.length,
-                  (index) => AnimatedContainer(
-                    duration: const Duration(milliseconds: 180),
-                    width: index == _currentPage ? 22 : 8,
-                    height: 8,
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    decoration: BoxDecoration(
-                      color: index == _currentPage
-                          ? AppPalette.primary
-                          : AppPalette.border,
-                      borderRadius: BorderRadius.circular(999),
+                    const Spacer(),
+                    TextButton(
+                      onPressed: widget.onFinished,
+                      child: const Text('Skip'),
                     ),
-                  ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 18),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  onPressed: () async {
-                    if (lastPage) {
-                      widget.onFinished();
-                      return;
+                const SizedBox(height: 8),
+                GestureDetector(
+                  onHorizontalDragEnd: (details) {
+                    final velocity = details.primaryVelocity ?? 0;
+                    if (velocity < -150 && !lastPage) {
+                      setState(() => _currentPage++);
+                    } else if (velocity > 150 && _currentPage > 0) {
+                      setState(() => _currentPage--);
                     }
-
-                    await _pageController.nextPage(
-                      duration: const Duration(milliseconds: 220),
-                      curve: Curves.easeOut,
-                    );
                   },
-                  child: Text(lastPage ? 'Start Now' : 'Continue'),
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 220),
+                    child: _OnboardingPage(
+                      key: ValueKey(_currentPage),
+                      data: _pages[_currentPage],
+                    ),
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(
+                    _pages.length,
+                    (index) => AnimatedContainer(
+                      duration: const Duration(milliseconds: 180),
+                      width: index == _currentPage ? 22 : 8,
+                      height: 8,
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      decoration: BoxDecoration(
+                        color: index == _currentPage
+                            ? AppPalette.primary
+                            : AppPalette.border,
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 18),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    onPressed: () {
+                      if (lastPage) {
+                        widget.onFinished();
+                        return;
+                      }
+
+                      setState(() => _currentPage++);
+                    },
+                    child: Text(lastPage ? 'Start Now' : 'Continue'),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -138,90 +132,88 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 }
 
 class _OnboardingPage extends StatelessWidget {
-  const _OnboardingPage({required this.data});
+  const _OnboardingPage({super.key, required this.data});
 
   final _OnboardingData data;
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [AppPalette.primary, AppPalette.secondary],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(18),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [AppPalette.primary, AppPalette.secondary],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: const Color(0x1FFFFFFF),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Icon(data.icon, color: Colors.white, size: 26),
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: const Color(0x1FFFFFFF),
+                  borderRadius: BorderRadius.circular(14),
                 ),
-                const SizedBox(height: 14),
-                Text(
-                  data.title,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    height: 1.08,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
-                  ),
+                child: Icon(data.icon, color: Colors.white, size: 26),
+              ),
+              const SizedBox(height: 14),
+              Text(
+                data.title,
+                style: const TextStyle(
+                  fontSize: 24,
+                  height: 1.08,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
                 ),
-                const SizedBox(height: 10),
-                Text(
-                  data.description,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    height: 1.5,
-                    color: Color(0xF2FFFFFF),
-                  ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                data.description,
+                style: const TextStyle(
+                  fontSize: 14,
+                  height: 1.5,
+                  color: Color(0xF2FFFFFF),
                 ),
-                const SizedBox(height: 12),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: data.chips
-                      .map(
-                        (chip) => Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0x1AFFFFFF),
-                            borderRadius: BorderRadius.circular(999),
-                            border: Border.all(color: const Color(0x33FFFFFF)),
-                          ),
-                          child: Text(
-                            chip,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700,
-                            ),
+              ),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: data.chips
+                    .map(
+                      (chip) => Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0x1AFFFFFF),
+                          borderRadius: BorderRadius.circular(999),
+                          border: Border.all(color: const Color(0x33FFFFFF)),
+                        ),
+                        child: Text(
+                          chip,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
-                      )
-                      .toList(),
-                ),
-              ],
-            ),
+                      ),
+                    )
+                    .toList(),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
