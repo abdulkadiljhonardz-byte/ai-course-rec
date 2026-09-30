@@ -38,7 +38,10 @@ Ang production files para sa GitHub Pages ay nasa `docs/` at maaaring buuin
 ulit gamit ang:
 
 ```bash
-flutter build web --release --base-href /ai-course-rec/ --output docs
+flutter build web --release \
+  --base-href /ai-course-rec/ \
+  --output docs \
+  --dart-define=GROQ_API_URL=https://asia-southeast1-msu-sulu-course-guide.cloudfunctions.net/groqProxy
 ```
 
 ### Flutter app
@@ -85,6 +88,20 @@ flutter run \
 Ang proxy endpoint ay dapat tumanggap ng Groq Responses API request body at
 magbalik ng kaparehong response shape. Sa Android release, naka-enable na ang
 internet permission.
+
+## Secure Web AI Proxy
+
+Ang public website ay gumagamit ng Firebase function sa `functions/`. Nasa
+Firebase Secret Manager ang `GROQ_API_KEY`; hindi ito kasama sa GitHub o sa
+compiled website. Para i-update ang backend:
+
+```bash
+cd functions
+npm install
+npm test
+cd ..
+firebase deploy --only functions:groqProxy --project msu-sulu-course-guide
+```
 
 ## Notes
 

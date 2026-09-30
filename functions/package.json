@@ -1,0 +1,17 @@
+{
+  "name": "msu-sulu-course-guide-functions",
+  "private": true,
+  "main": "index.js",
+  "engines": {
+    "node": "22"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "dependencies": {
+    "firebase-functions": "^6.6.0"
+  },
+  "overrides": {
+    "uuid": "^11.1.0"
+  }
+}
