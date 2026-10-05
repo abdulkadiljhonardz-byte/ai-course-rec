@@ -397,7 +397,11 @@ class _RecommendScreenState extends State<RecommendScreen> {
                     label: 'SASE Rating / Score',
                     icon: Icons.assessment_outlined,
                     keyboardType: TextInputType.number,
-                    validator: _scoreValidator,
+                    validator: (value) => _scoreValidator(
+                      value,
+                      maximum: 180,
+                      rangeMessage: 'Use 0-180',
+                    ),
                     centered: true,
                     valueStyle: const TextStyle(
                       fontSize: 42,
@@ -960,7 +964,11 @@ class _RecommendScreenState extends State<RecommendScreen> {
         }
         return true;
       case 1:
-        return _validateScore(_saseController) &&
+        return _validateScore(
+              _saseController,
+              maximum: 180,
+              rangeMessage: 'Use a valid SASE score from 0 to 180.',
+            ) &&
             _validateFields([_examYearController]);
       case 2:
         return _validateScore(_mathController) &&
@@ -984,10 +992,14 @@ class _RecommendScreenState extends State<RecommendScreen> {
     return true;
   }
 
-  bool _validateScore(TextEditingController controller) {
+  bool _validateScore(
+    TextEditingController controller, {
+    int maximum = 100,
+    String rangeMessage = 'Use a valid score from 0 to 100.',
+  }) {
     final score = int.tryParse(controller.text.trim());
-    if (score == null || score < 0 || score > 100) {
-      _showMessage('Use a valid score from 0 to 100.');
+    if (score == null || score < 0 || score > maximum) {
+      _showMessage(rangeMessage);
       return false;
     }
     return true;
@@ -1016,7 +1028,11 @@ class _RecommendScreenState extends State<RecommendScreen> {
     return null;
   }
 
-  String? _scoreValidator(String? value) {
+  String? _scoreValidator(
+    String? value, {
+    int maximum = 100,
+    String rangeMessage = 'Use 0-100',
+  }) {
     final trimmed = value?.trim() ?? '';
     if (trimmed.isEmpty) {
       return 'Required';
@@ -1025,8 +1041,8 @@ class _RecommendScreenState extends State<RecommendScreen> {
     if (parsed == null) {
       return 'Use number';
     }
-    if (parsed < 0 || parsed > 100) {
-      return 'Use 0-100';
+    if (parsed < 0 || parsed > maximum) {
+      return rangeMessage;
     }
     return null;
   }
